@@ -2,7 +2,7 @@ version: "3"
 
 services:
   joomla:
-    image: joomla
+    image: p2718na/joomla
     deploy:
       restart_policy:
         condition: on-failure

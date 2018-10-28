@@ -1,0 +1,24 @@
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        access_log /var/log/nginx/joomla.access_log;
+        error_log /var/log/nginx/joomla.error_log info;
+
+        root /var/www/html/joomla;
+
+        index index.html index.htm index.php;
+
+        server_name localhost;
+
+        location / {
+            try_files $uri $uri/ /index.php$args;
+        }
+
+        location ~ \.php$ {
+            include snippets/fastcgi-php.conf;
+            fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+        }
+}

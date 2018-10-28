@@ -8,24 +8,16 @@ services:
         condition: on-failure
     ports:
     - "8080:80"
-    environment:
-      JOOMLA_DB_HOST: joomladb
-      JOOMLA_DB_USER: root
-      JOOMLA_DB_PASSWORD: password
-    networks:
-      - webnet
 
-  joomladb:
+  db:
     image: mysql:5.7
     deploy:
       restart_policy:
         condition: on-failure
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: joomla
+      MYSQL_USER: joomla
+      MYSQL_PASSWORD: joomla
+      MYSQL_DATABASE: joomla
     volumes:
     - ./mysql-data:/var/lib/mysql
-    networks:
-    - webnet
-
-networks:
-  webnet:

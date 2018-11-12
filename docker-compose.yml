@@ -2,12 +2,21 @@ version: "3"
 
 services:
   joomla:
-    image: p2718na/joomla
+    build: .
     deploy:
       restart_policy:
         condition: on-failure
     ports:
-    - "8080:80"
+      - "8080:80"
+    volumes:
+      - ./state/images:/var/www/html/joomla/images
+      - ./state/logs:/var/log/nginx
+    depends_on:
+      - db
+    environment:
+      MYSQL_ROOT_PASSWORD: joomla
+      MYSQL_DATABASE: joomla
+      SITE_NAME: test
 
   db:
     image: mysql:5.7
@@ -20,4 +29,4 @@ services:
       MYSQL_PASSWORD: joomla
       MYSQL_DATABASE: joomla
     volumes:
-    - ./mysql-data:/var/lib/mysql
+      - ./state/mysql-data:/var/lib/mysql

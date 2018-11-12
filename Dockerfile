@@ -3,15 +3,21 @@ FROM debian:stretch
 EXPOSE 80
 
 RUN apt-get update -y
-RUN apt-get -y install nginx php7.0-cli php7.0-cgi php7.0-fpm unzip wget vim
+RUN apt-get upgrade -y
+RUN apt-get -y install nginx php7.0-cli php7.0-cgi php7.0-fpm php7.0-simplexml php7.0-json php7.0-mysql unzip wget vim
 
-RUN cd /tmp && wget https://github.com/joomla/joomla-cms/releases/download/3.8.13/Joomla_3.8.13-Stable-Full_Package.zip
-RUN mkdir -p /var/www/html/joomla
-RUN unzip /tmp/Joomla*.zip -d /var/www/html/joomla
+RUN wget https://getcomposer.org/installer && php installer
+RUN php composer.phar global require joomlatools/console --no-interaction
+
 COPY ./etc /etc
-RUN chown -R www-data:www-data /var/www/html/joomla/
-RUN chmod -R 755 /var/www/html/joomla/
 RUN ln -s /etc/nginx/sites-available/joomla /etc/nginx/sites-enabled/
 RUN rm /etc/nginx/sites-enabled/default
 
-CMD service php7.0-fpm start && nginx -g "daemon off;"
+CMD ~/.composer/vendor/bin/joomla site:create --www=/tmp --mysql-login=root:$MYSQL_ROOT_PASSWORD \
+    --mysql-host=db --mysql-database=$MYSQL_DATABASE $SITE_NAME && \
+    mv /tmp/$SITE_NAME/* /var/www/html && \
+    rm -rf /tmp/$SITE_NAME && \
+    chmod -R 755 /var/www/html/ && \
+    chown -R www-data:www-data /var/www/html/ && \
+    service php7.0-fpm start && \
+    nginx -g "daemon off;"
